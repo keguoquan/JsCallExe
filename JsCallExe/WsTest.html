@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>websocket测试页</title>
+    <style type="text/css">
+        html{font-size:14px;}
+        .layTable{}
+        .layTable input[type="text"]{height:28px;line-height:28px;vertical-align:middle;width:280px;}
+        .layTable input[type="button"]{height:28px;line-height:28px;vertical-align:middle;width:80px;}
+        .layTable .abut{color:blue;cursor:pointer;}
+        .layTable tr{height:35px;}
+        .MsgContent{width:1000px;border:0px solid red;overflow:auto;}
+        .MsgContent p{margin:0 0 0 0;padding:0 0 0 0;min-height:28px;line-height:20px;word-wrap:break-word;}
+        /*奇数行*/
+        .MsgContent p.odd { background-color: #F3F3F3; }
+        /*偶数行*/
+        .MsgContent p.even { background-color: #fff; }
+        .MsgContent .dateSpan{color:blue;}
+    </style>    
+    <script src="WSocket.js"></script>
+    <script type="text/javascript">
+        
+        //发送消息
+        var scc=null;
+        function SendMsg() {
+            var path = document.getElementById("txtWsUrl").value;
+            var sendMsg = document.getElementById("txtSend").value;
+            SocketCall(path, sendMsg, function (data) {
+                Output("返回结果：" + JSON.stringify(data));
+            }, function (msg, isHeart) {
+                if (isHeart) {
+                    if (document.getElementById("cheHeatMsg").checked) {
+                        Output(msg);
+                    }
+                } else {
+                    document.getElementById("td_sockeTitle").innerHTML = msg;
+                    Output(msg);
+                }
+            });
+            document.getElementById("td_sockeTitle").innerHTML = "请求发送中...";
+            Output("请求发送中...");
+        }
+        
+        function ClearMsg() {
+            document.getElementById("DivMsgContent").innerHTML = "";
+        }
+
+        var rowIdx = 0;
+        function Output(log) {
+            var dateStr = GetCurrentTimeStr();
+            var pclass = "class='even'";
+            if (rowIdx % 2 == 0) {
+                pclass = "class='odd'";
+            }
+            rowIdx++;
+            var html = '<p ' + pclass + '><span class="dateSpan">' + dateStr + "</span>：" + log + '</p>';
+            document.getElementById("DivMsgContent").innerHTML += html;
+        }
+
+        //获取当前时间
+        function GetCurrentTimeStr() {
+            var now = new Date();
+            return now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+        }
+    </script>
+</head>
+<body>
+    <table class="layTable">
+        <tr>
+            <td>地址：</td>
+            <td>
+                <input type="text" value="/yb" id="txtWsUrl"/>
+                <input type="button" value="发送" onclick="SendMsg()"/>
+                <input type="button" value="清空" onclick="ClearMsg()" />
+                <label><input type="checkbox" value="清空" id="cheHeatMsg"/>输出心跳</label>
+            </td>
+        </tr>
+        <tr>
+            <td>发送内容：</td>
+            <td>
+                <textarea style="width:800px;height:150px;" id="txtSend">xsdddd</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td style="vertical-align:top;" valign="top">状态：</td>
+            <td id="td_sockeTitle">
+                
+            </td>
+        </tr>
+        <tr>
+            <td style="vertical-align:top;" valign="top">消息输出：</td>
+            <td>
+                <div class="MsgContent" id="DivMsgContent">                    
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
